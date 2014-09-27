@@ -21,7 +21,7 @@ public class Main {
 		 String s = in.nextLine().toLowerCase();
 		 while(true){
 			 if (s.equals("client")){
-				 System.out.println("Enter IP address of server:");
+				 System.out.println("Enter IP address or domain name of server:");
 				 System.out.print(">>> ");
 				 s = in.nextLine().toLowerCase();
 				 try {new NioClient(s, 8000).run();} catch (Exception e) {e.printStackTrace();}

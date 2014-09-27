@@ -1,5 +1,6 @@
 package Core;
 
+import Core.Reject.ccode;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundMessageHandlerAdapter;
@@ -12,45 +13,60 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 		//incoming.write("[ECHO] " + message + "\n");
 		System.out.println("Received message from " + incoming.remoteAddress() + ":");
 		Parser p = new Parser((byte[]) msg);
-		p.printMessage();
-		switch(p.command){
-			case VERSION:
-				Version ver = new Version (p.payload);
-				ver.printVersion();
-				System.out.println("");
-				System.out.println("Sending VERACK message...");
-				System.out.println("");
-				Message verack = new Message(Command.VERACK, new byte[0]);
-				if (ver.version<10000){
+		if (p.malformed){
+			System.out.println("Message malformed. Sending REJECT message...");
+			Reject r = new Reject(p.command, ccode.REJECT_MALFORMED);
+			Message rejectmessage = new Message(Command.REJECT, r.serialize());
+			incoming.write(rejectmessage.serialize());
+		}
+		else {
+			p.printMessage();
+			switch(p.command){
+				case VERSION:
+					Version ver = new Version (p.payload);
+					ver.printVersion();
+					System.out.println("");
+					System.out.println("Sending VERACK message...");
+					System.out.println("");
+					Message verack = new Message(Command.VERACK, new byte[0]);
+					if (ver.version<10000){
 					//Do something if it isn't the version we're looking for
-				} 
-				incoming.write(verack.serialize());
-				System.out.println("Enter a command:");
-				System.out.print(">>> ");
-				break;
+					} 
+					incoming.write(verack.serialize());
+					System.out.println("Enter a command:");
+					System.out.print(">>> ");
+					break;
 	
-			case VERACK:
-				System.out.println("");
-				break;
+				case VERACK:
+					System.out.println("");
+					break;
 				
-			case PING:
-				Ping ping = new Ping(p.payload);
-				System.out.println("");
-				System.out.println("Sending PONG message...");
-				Pong pong = new Pong(ping.nonce);
-				Message msgpong = new Message(Command.PONG, pong.serialize());
-				incoming.write(msgpong.serialize());
-				break;
+				case PING:
+					Ping ping = new Ping(p.payload);
+					System.out.println("");
+					System.out.println("Sending PONG message...");
+					Pong pong = new Pong(ping.nonce);
+					Message msgpong = new Message(Command.PONG, pong.serialize());
+					incoming.write(msgpong.serialize());
+					break;
 				
-			case PONG:
-				Pong pongresp = new Pong(p.payload);
-				byte[] nonce = pongresp.nonce;
-				//This is where we will check to see if the received nonce is the same as the one we sent.
-				//If so, then we connected to ourselves and must disconnect.
-				System.out.println("");
-				System.out.println("Enter a command:");
-				System.out.print(">>> ");
-				break;			
+				case PONG:
+					Pong pongresp = new Pong(p.payload);
+					byte[] nonce = pongresp.nonce;
+					//This is where we will check to see if the received nonce is the same as the one we sent.
+					//If so, then we connected to ourselves and must disconnect.
+					System.out.println("");
+					System.out.println("Enter a command:");
+					System.out.print(">>> ");
+					break;			
+			
+				case REJECT:
+					Reject r = new Reject(p.payload);
+					r.printReject();
+					System.out.println("");
+					System.out.println("Enter a command:");
+					System.out.print(">>> ");
+			}
 		}
 	}
 	

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 
+import Core.Reject.ccode;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -31,7 +32,7 @@ public class NioClient {
 				.channel(NioSocketChannel.class)
 				.handler(new ClientInitializer());
 			channel = bootstrap.connect(host, port).sync().channel();
-			System.out.println("Enter a command:");
+			System.out.println("Enter a command: ");
 			System.out.print(">>> ");
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			while(true){
@@ -49,6 +50,13 @@ public class NioClient {
 					System.out.println("Sending PING message...");
 					System.out.println("");
 				}
+				else if (command.toLowerCase().equals("reject")){
+					Reject r = new Reject(Command.VERSION, ccode.REJECT_MALFORMED);
+					message = new Message(Command.REJECT, r.serialize());
+					System.out.println("Sending REJECT message...");
+					System.out.println("");
+				}
+				else if (command.toLowerCase().equals("exit")){break;}
 				else {
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");
