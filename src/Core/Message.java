@@ -38,6 +38,8 @@ public class Message {
 		outputStream.write(ByteBuffer.allocate(4).putInt(length).array());
 		outputStream.write(checksum);
 		outputStream.write(payload);
+		String append = "\r\n";
+		outputStream.write(append.getBytes());
 		byte output[] = outputStream.toByteArray();
 		return output;
 	}
