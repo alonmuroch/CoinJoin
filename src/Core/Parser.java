@@ -23,6 +23,8 @@ public class Parser {
 		}
 		if (Arrays.equals(cmd, Command.VERSION.getValue())){command = Command.VERSION;}
 		else if (Arrays.equals(cmd, Command.VERACK.getValue())){command = Command.VERACK;}
+		else if (Arrays.equals(cmd, Command.PING.getValue())){command = Command.PING;}
+		else if (Arrays.equals(cmd, Command.PONG.getValue())){command = Command.PONG;}
 		a = 0;
 		byte len[] = new byte[4];
 		for (int i = 16; i<20; i++){

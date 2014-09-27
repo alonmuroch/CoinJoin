@@ -38,7 +38,7 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 		p.printMessage();
 		switch(p.command){
 			case VERSION:
-				Version ver = new Version (p.payload);
+				Version ver = new Version(p.payload);
 				ver.printVersion();
 				System.out.println("");
 				System.out.println("Sending VERACK message...");
@@ -57,7 +57,22 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 			case VERACK:
 				System.out.println("");
 				break;
-			
+				
+			case PING:
+				Ping ping = new Ping(p.payload);
+				System.out.println("");
+				System.out.println("Sending PONG message...");
+				Pong pong = new Pong(ping.nonce);
+				Message msgpong = new Message(Command.PONG, pong.serialize());
+				incoming.write(msgpong.serialize());
+				break;
+				
+			case PONG:
+				Pong pongresp = new Pong(p.payload);
+				byte[] nonce = pongresp.nonce;
+				//This is where we will check to see if the received nonce is the same as the one we sent.
+				//If so, then we connected to ourselves and must disconnect.
+				break;
 		}
 	}
 

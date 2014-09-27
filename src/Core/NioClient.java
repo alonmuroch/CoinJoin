@@ -43,6 +43,12 @@ public class NioClient {
 					System.out.println("Sending VERSION message...");
 					System.out.println("");
 				}
+				else if (command.toLowerCase().equals("ping")){
+					Ping ping = new Ping();
+					message = new Message(Command.PING, ping.serialize());
+					System.out.println("Sending PING message...");
+					System.out.println("");
+				}
 				else {
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");

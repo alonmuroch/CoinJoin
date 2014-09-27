@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import org.apache.commons.codec.binary.Base32;
+
 public class Main {
 	
 	public final int COINJOIN_VERSION = 10000;
@@ -19,11 +21,10 @@ public class Main {
 		 String s = in.nextLine().toLowerCase();
 		 while(true){
 			 if (s.equals("client")){
-				 try {
-					 	new NioClient("localhost", 8000).run();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				 System.out.println("Enter IP address of server:");
+				 System.out.print(">>> ");
+				 s = in.nextLine().toLowerCase();
+				 try {new NioClient(s, 8000).run();} catch (Exception e) {e.printStackTrace();}
 				 break;
 			 }
 			 else if (s.equals("server")){
