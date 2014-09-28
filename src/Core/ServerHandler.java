@@ -1,5 +1,11 @@
 package Core;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import Core.NetworkAddress.NetworkType;
 import Core.Reject.ccode;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -26,7 +32,7 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 		channels.remove(ctx.channel());
 		System.out.println(incoming.remoteAddress() + " has disconnected");
 		System.out.println("");
-		Main.peergroup.disconnectPeer(incoming.remoteAddress());
+		Main.peergroup.disconnectPeer(Peer.getPeerID(incoming.remoteAddress()));
 	}
 
 	@Override
@@ -47,7 +53,16 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					} 
 					System.out.println("");
 					System.out.println("Added new peer:");
-					Peer peer = new Peer(incoming.remoteAddress(), ver.version, ver.onion, true);
+					Peer peer = null;
+					//If using IP network
+					if (Arrays.equals(ver.onion, Utils.IP)){
+						String ip = incoming.remoteAddress().toString().substring(1, incoming.remoteAddress().toString().indexOf(":"));
+						peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
+					}
+					//If using Tor
+					else {
+						peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
+					}
 					Main.peergroup.addConnected(peer);
 					peer.printPeer();
 					System.out.println("");
@@ -84,6 +99,14 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 				
 				case GETADDR:
 					System.out.println("");
+					System.out.println("Sending ADDR message...");
+					ArrayList<NetworkAddress> addressList = new ArrayList<NetworkAddress>();
+					for (Peer peers : Main.peergroup.peergroup){
+						addressList.add(peers.networkAddress);
+					}
+					Addr a = new Addr(addressList);
+					Message addrmgs = new Message(Command.ADDR, a.serialize());
+					incoming.write(addrmgs.serialize());
 					break;
 					
 				case REJECT:

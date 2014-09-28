@@ -11,13 +11,14 @@ import Core.Reject.ccode;
 
 public class NetworkAddress {
 
-	long timestamp = System.currentTimeMillis() / 1000L;
+	long timestamp;
 	NetworkType network;
 	byte[] addr;
 	byte[] port = new byte[] { (byte) 0x1F, (byte) 0x40};
 	
-	public NetworkAddress(NetworkType type, byte[] addr) throws IOException{
+	public NetworkAddress(NetworkType type, byte[] addr, long timestamp) throws IOException{
 		this.network = type;
+		this.timestamp = timestamp;
 		if (type==NetworkType.IPv6){this.addr = addr;}
 		else if (type==NetworkType.IPv4){
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );

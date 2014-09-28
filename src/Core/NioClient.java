@@ -61,7 +61,6 @@ public class NioClient {
 					message = new Message(Command.GETADDR, new byte[0]);
 					System.out.println("Sending GETADDR message...");
 					System.out.println("");
-					System.out.print(">>> ");
 				}
 				
 				else if (command.toLowerCase().equals("exit")){break;}

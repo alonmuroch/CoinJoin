@@ -1,5 +1,8 @@
 package Core;
 
+import java.util.Arrays;
+
+import Core.NetworkAddress.NetworkType;
 import Core.Reject.ccode;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,7 +26,21 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					} 
 					System.out.println("");
 					System.out.println("Added new peer:");
-					Peer peer = new Peer(incoming.remoteAddress(), ver.version, ver.onion, true);
+					Peer peer = null;
+					//If using IP network
+					if (Arrays.equals(ver.onion, Utils.IP)){
+						String socketAddress = incoming.remoteAddress().toString();
+						String ip = null;
+						if (socketAddress.substring(0,9).equals("localhost")){
+							socketAddress = incoming.remoteAddress().toString().substring(incoming.remoteAddress().toString().indexOf("/"), incoming.remoteAddress().toString().length());
+						}
+						ip = socketAddress.substring(1, socketAddress.indexOf(":"));
+						peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
+					}
+					//If using Tor
+					else {
+						peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
+					}
 					Main.peergroup.addConnected(peer);
 					peer.printPeer();
 					System.out.println("");
@@ -60,6 +77,14 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 				
 				case GETADDR:
 					System.out.println("");
+					break;
+					
+				case ADDR:
+					Addr a = new Addr(p.payload);
+					a.printAddr();
+					System.out.println("");
+					System.out.println("Enter a command:");
+					System.out.print(">>> ");
 					break;
 			
 				case REJECT:

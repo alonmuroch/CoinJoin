@@ -2,6 +2,7 @@ package Core;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PeerGroup {
 
@@ -14,9 +15,9 @@ public class PeerGroup {
 	public void addConnected(Peer peer){
 		boolean exists = false;
 		for (Peer p : peergroup){
-			if (p.addr == peer.addr){
+			if (Arrays.equals(p.networkAddress.addr, peer.networkAddress.addr)){
 				exists = true;
-				p.connected = true;
+				p.peerID = peer.peerID;
 			}
 		}
 		if (!exists){peergroup.add(peer);}
@@ -25,24 +26,24 @@ public class PeerGroup {
 	public void addDisconnected(Peer peer){
 		boolean exists = false;
 		for (Peer p : peergroup){
-			if (p.addr == peer.addr){
+			if (p.networkAddress.addr == peer.networkAddress.addr){
 				exists = true;
-				p.connected = false;
+				p.peerID = new byte[]{00};
 			}
 		}
 		if (!exists){peergroup.add(peer);}
 	}
 	
-	public void disconnectPeer(SocketAddress addr){
+	public void disconnectPeer(byte[] peerID){
 		for (Peer p : peergroup){
-			if (p.addr == addr){p.connected = false;}
+			if (Arrays.equals(p.peerID, peerID)){p.peerID = new byte[]{00};}
 		}
 	}
 	
 	public ArrayList<Peer> getConnectedPeers(){
 		ArrayList<Peer> connected = new ArrayList<Peer>();
 		for (Peer p : peergroup){
-			if (p.connected){
+			if (Arrays.equals(p.peerID, new byte[]{00})){
 				connected.add(p);
 			}
 		}

@@ -29,6 +29,7 @@ public class Parser {
 			else if (Arrays.equals(cmd, Command.PING.getValue())){command = Command.PING;}
 			else if (Arrays.equals(cmd, Command.PONG.getValue())){command = Command.PONG;}
 			else if (Arrays.equals(cmd, Command.GETADDR.getValue())){command = Command.GETADDR;}
+			else if (Arrays.equals(cmd, Command.ADDR.getValue())){command = Command.ADDR;}
 			else if (Arrays.equals(cmd, Command.REJECT.getValue())){command = Command.REJECT;}
 			a = 0;
 			byte len[] = new byte[4];
@@ -77,6 +78,8 @@ public class Parser {
 		else if (Arrays.equals(cmd, Command.VERACK.getValue())){c = Command.VERACK;}
 		else if (Arrays.equals(cmd, Command.PING.getValue())){c = Command.PING;}
 		else if (Arrays.equals(cmd, Command.PONG.getValue())){c = Command.PONG;}
+		else if (Arrays.equals(cmd, Command.ADDR.getValue())){c = Command.ADDR;}
+		else if (Arrays.equals(cmd, Command.GETADDR.getValue())){c = Command.GETADDR;}
 		else if (Arrays.equals(cmd, Command.REJECT.getValue())){c = Command.REJECT;}
 		return c;
 	}
