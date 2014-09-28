@@ -32,7 +32,7 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 		channels.remove(ctx.channel());
 		System.out.println(incoming.remoteAddress() + " has disconnected");
 		System.out.println("");
-		Main.peergroup.disconnectPeer(Peer.getPeerID(incoming.remoteAddress()));
+		Main.coinjoin.peergroup.disconnectPeer(Peer.getPeerID(incoming.remoteAddress()));
 	}
 
 	@Override
@@ -46,7 +46,8 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 			p.printMessage();
 			switch(p.command){
 				case VERSION:
-					Version ver = new Version(p.payload);
+					Version ver = new Version();
+					ver.parse(p.payload);
 					ver.printVersion();
 					if (ver.version<10000){
 						//Do something if it isn't the version we're looking for
@@ -63,13 +64,13 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					else {
 						peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
 					}
-					Main.peergroup.addConnected(peer);
+					Main.coinjoin.peergroup.addConnected(peer);
 					peer.printPeer();
 					System.out.println("");
 					System.out.println("Sending VERACK message...");
 					Message verack = new Message(Command.VERACK, new byte[0]);
 					incoming.write(verack.serialize());
-					ver = new Version();
+					ver = new Version(Main.coinjoin.nonce);
 					Message version = new Message(Command.VERSION, ver.serialize());
 					System.out.println("Sending VERSION message...");
 					System.out.println("");
@@ -101,7 +102,7 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					System.out.println("");
 					System.out.println("Sending ADDR message...");
 					ArrayList<NetworkAddress> addressList = new ArrayList<NetworkAddress>();
-					for (Peer peers : Main.peergroup.peergroup){
+					for (Peer peers : Main.coinjoin.peergroup.peergroup){
 						addressList.add(peers.networkAddress);
 					}
 					Addr a = new Addr(addressList);

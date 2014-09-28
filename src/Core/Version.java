@@ -17,25 +17,25 @@ public class Version {
 	byte[] onion = new byte[10];
 	byte[] nonce = new byte[8];
 	
-	public Version() {
-		SecureRandom sr = new SecureRandom();
-		nonce = new byte[8];
-		sr.nextBytes(nonce);
+	public Version(){
+		
+	}
+	
+	public Version(byte[] nonce) {
+		this.nonce = nonce;
 		byte[] zeros = {00,00,00,00,00,00,00,00,00,00};
 		this.onion = zeros;
 	}
 	
-	public Version(String onion) {
+	public Version(String onion, byte[] nonce) {
 		//Onion is base32 representation of the Tor .onion address; 
 		//Encode using:  String base32String = Base32.encode(rawDataBytes);
 		Base32 base32 = new Base32();
 		this.onion = base32.decode(onion);
-		SecureRandom sr = new SecureRandom();
-		nonce = new byte[8];
-		sr.nextBytes(nonce);
+		this.nonce = nonce;
 	}
 	
-	public Version(byte[] payload){
+	public void parse(byte[] payload){
 		byte[] ver = new byte[4];
 		for (int i=0; i<4; i++){ver[i]=payload[i];}
 		ByteBuffer wrapped = ByteBuffer.wrap(ver);

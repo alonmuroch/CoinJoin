@@ -19,37 +19,43 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 			p.printMessage();
 			switch(p.command){
 				case VERSION:
-					Version ver = new Version (p.payload);
+					Version ver = new Version();
+					ver.parse(p.payload);
 					ver.printVersion();
 					if (ver.version<10000){
 						//Do something if it isn't the version we're looking for
 					} 
-					System.out.println("");
-					System.out.println("Added new peer:");
-					Peer peer = null;
-					//If using IP network
-					if (Arrays.equals(ver.onion, Utils.IP)){
-						String socketAddress = incoming.remoteAddress().toString();
-						String ip = null;
-						if (socketAddress.substring(0,9).equals("localhost")){
-							socketAddress = incoming.remoteAddress().toString().substring(incoming.remoteAddress().toString().indexOf("/"), incoming.remoteAddress().toString().length());
-						}
-						ip = socketAddress.substring(1, socketAddress.indexOf(":"));
-						peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
+					if (Arrays.equals(ver.nonce, Main.coinjoin.nonce)){
+						Main.coinjoin.clients.get(0).close();
 					}
-					//If using Tor
 					else {
-						peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
+						System.out.println("");
+						System.out.println("Added new peer:");
+						Peer peer = null;
+						//If using IP network
+						if (Arrays.equals(ver.onion, Utils.IP)){
+							String socketAddress = incoming.remoteAddress().toString();
+							String ip = null;
+							if (socketAddress.contains("/")){
+								socketAddress = incoming.remoteAddress().toString().substring(incoming.remoteAddress().toString().indexOf("/"), incoming.remoteAddress().toString().length());
+							}
+							ip = socketAddress.substring(1, socketAddress.indexOf(":"));
+							peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
+						}
+						//If using Tor
+						else {
+							peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
+						}
+						Main.coinjoin.peergroup.addConnected(peer);
+						peer.printPeer();
+						System.out.println("");
+						System.out.println("Sending VERACK message...");
+						System.out.println("");
+						Message verack = new Message(Command.VERACK, new byte[0]);
+						incoming.write(verack.serialize());
+						System.out.println("Enter a command:");
+						System.out.print(">>> ");
 					}
-					Main.peergroup.addConnected(peer);
-					peer.printPeer();
-					System.out.println("");
-					System.out.println("Sending VERACK message...");
-					System.out.println("");
-					Message verack = new Message(Command.VERACK, new byte[0]);
-					incoming.write(verack.serialize());
-					System.out.println("Enter a command:");
-					System.out.print(">>> ");
 					break;
 	
 				case VERACK:
