@@ -10,28 +10,26 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
 		Channel incoming = ctx.channel();
-		//incoming.write("[ECHO] " + message + "\n");
 		System.out.println("Received message from " + incoming.remoteAddress() + ":");
-		Parser p = new Parser((byte[]) msg);
-		if (p.malformed){
-			System.out.println("Message malformed. Sending REJECT message...");
-			Reject r = new Reject(p.command, ccode.REJECT_MALFORMED);
-			Message rejectmessage = new Message(Command.REJECT, r.serialize());
-			incoming.write(rejectmessage.serialize());
-		}
-		else {
+		try {
+			Parser p = new Parser((byte[]) msg);
 			p.printMessage();
 			switch(p.command){
 				case VERSION:
 					Version ver = new Version (p.payload);
 					ver.printVersion();
+					if (ver.version<10000){
+						//Do something if it isn't the version we're looking for
+					} 
+					System.out.println("");
+					System.out.println("Added new peer:");
+					Peer peer = new Peer(incoming.remoteAddress(), ver.version, ver.onion, true);
+					Main.peergroup.addConnected(peer);
+					peer.printPeer();
 					System.out.println("");
 					System.out.println("Sending VERACK message...");
 					System.out.println("");
 					Message verack = new Message(Command.VERACK, new byte[0]);
-					if (ver.version<10000){
-					//Do something if it isn't the version we're looking for
-					} 
 					incoming.write(verack.serialize());
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");
@@ -59,6 +57,10 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");
 					break;			
+				
+				case GETADDR:
+					System.out.println("");
+					break;
 			
 				case REJECT:
 					Reject r = new Reject(p.payload);
@@ -67,6 +69,16 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");
 			}
+		} catch (MalformedMessageException e){
+			System.out.println("Message malformed. Sending REJECT message...");
+			Reject r = new Reject(Parser.getCommand((byte[]) msg), ccode.REJECT_MALFORMED);
+			Message rejectmessage = new Message(Command.REJECT, r.serialize());
+			incoming.write(rejectmessage.serialize());
+		} catch (InvalidChecksumException e1){
+			System.out.println("Invalid Checksum. Sending REJECT message...");
+			Reject r = new Reject(Parser.getCommand((byte[]) msg), ccode.REJECT_MALFORMED);
+			Message rejectmessage = new Message(Command.REJECT, r.serialize());
+			incoming.write(rejectmessage.serialize());
 		}
 	}
 	

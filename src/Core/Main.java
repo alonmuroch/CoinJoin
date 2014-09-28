@@ -5,15 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.apache.commons.codec.binary.Base32;
 
+import Core.NetworkAddress.NetworkType;
+
 public class Main {
 	
 	public final int COINJOIN_VERSION = 10000;
+	public static PeerGroup peergroup = new PeerGroup();
 	
-	 public static void main(String[] args) throws InterruptedException {
+	 public static void main(String[] args) throws InterruptedException, IOException {
 		 args = new String[1];
 		 System.out.println("Are you client or server?");
 		 Scanner in = new Scanner(System.in);

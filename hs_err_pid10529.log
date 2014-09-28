@@ -1,0 +1,471 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 594280448 bytes for committing reserved memory.
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   In 32 bit mode, the process size limit was hit
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Use 64 bit Java on a 64 bit OS
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_linux.cpp:2718), pid=10529, tid=4135385920
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_05-b13) (build 1.8.0_05-b13)
+# Java VM: Java HotSpot(TM) Server VM (25.5-b02 mixed mode linux-x86 )
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0xf6607400):  JavaThread "main" [_thread_in_vm, id=10535, stack(0xf677f000,0xf67d0000)]
+
+Stack: [0xf677f000,0xf67d0000],  sp=0xf67ce93c,  free space=318k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0x862759]  VMError::report_and_die()+0x179
+V  [libjvm.so+0x35aba5]  report_vm_out_of_memory(char const*, int, unsigned int, VMErrorType, char const*)+0x55
+V  [libjvm.so+0x6f24f6]  os::Linux::commit_memory_impl(char*, unsigned int, bool)+0xe6
+V  [libjvm.so+0x6f29c8]  os::pd_commit_memory(char*, unsigned int, unsigned int, bool)+0x28
+V  [libjvm.so+0x6ec23c]  os::commit_memory(char*, unsigned int, unsigned int, bool)+0x2c
+V  [libjvm.so+0x754a18]  PSVirtualSpace::expand_by(unsigned int)+0x48
+V  [libjvm.so+0x747cce]  PSOldGen::expand_by(unsigned int)+0x2e
+V  [libjvm.so+0x747f08]  PSOldGen::expand(unsigned int)+0x178
+V  [libjvm.so+0x74812b]  PSOldGen::expand_and_allocate(unsigned int)+0x1b
+V  [libjvm.so+0x7481f1]  PSOldGen::allocate(unsigned int)+0x81
+V  [libjvm.so+0x71217e]  ParallelScavengeHeap::mem_allocate(unsigned int, bool*)+0xbe
+V  [libjvm.so+0x8303dd]  TypeArrayKlass::allocate_common(int, bool, Thread*)+0x1cd
+V  [libjvm.so+0x6e2c70]  oopFactory::new_typeArray(BasicType, int, Thread*)+0x20
+V  [libjvm.so+0x4a37a5]  InterpreterRuntime::newarray(JavaThread*, BasicType, int)+0x35
+j  Core.Parser.<init>([B)V+266
+j  Core.Main.main([Ljava/lang/String;)V+31
+v  ~StubRoutines::call_stub
+V  [libjvm.so+0x4afdff]  JavaCalls::call_helper(JavaValue*, methodHandle*, JavaCallArguments*, Thread*)+0x101f
+V  [libjvm.so+0x6ed549]  os::os_exception_wrapper(void (*)(JavaValue*, methodHandle*, JavaCallArguments*, Thread*), JavaValue*, methodHandle*, JavaCallArguments*, Thread*)+0x19
+V  [libjvm.so+0x4ae3cf]  JavaCalls::call(JavaValue*, methodHandle, JavaCallArguments*, Thread*)+0x2f
+V  [libjvm.so+0x4f513f]  jni_invoke_static(JNIEnv_*, JavaValue*, _jobject*, JNICallType, _jmethodID*, JNI_ArgumentPusher*, Thread*)+0x38f
+V  [libjvm.so+0x50006f]  jni_CallStaticVoidMethod+0xdf
+C  [libjli.so+0x71bf]  JavaMain+0x91f
+C  [libpthread.so.0+0x6f70]  start_thread+0xd0
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  Core.Parser.<init>([B)V+266
+j  Core.Main.main([Ljava/lang/String;)V+31
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0xab4ac400 JavaThread "Service Thread" daemon [_thread_blocked, id=10547, stack(0xaad8a000,0xaaddb000)]
+  0xab4a9400 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=10546, stack(0xaaddb000,0xaae5c000)]
+  0xab4a8000 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=10545, stack(0xaae5c000,0xaaedd000)]
+  0xab4a6000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=10544, stack(0xaaedd000,0xaaf5e000)]
+  0xab4a4800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=10543, stack(0xaaf5e000,0xaafaf000)]
+  0xab486400 JavaThread "Finalizer" daemon [_thread_blocked, id=10542, stack(0xab1af000,0xab200000)]
+  0xab484000 JavaThread "Reference Handler" daemon [_thread_blocked, id=10541, stack(0xab521000,0xab572000)]
+=>0xf6607400 JavaThread "main" [_thread_in_vm, id=10535, stack(0xf677f000,0xf67d0000)]
+
+Other Threads:
+  0xab480c00 VMThread [stack: 0xab572000,0xab5f3000] [id=10540]
+  0xab4bec00 WatcherThread [stack: 0xaad09000,0xaad8a000] [id=10548]
+
+VM state:synchronizing (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0xf6604828] ExpandHeap_lock - owner thread: 0xf6607400
+[0xf6604d70] Threads_lock - owner thread: 0xab480c00
+[0xf6605180] Heap_lock - owner thread: 0xf6607400
+
+Heap:
+ PSYoungGen      total 17408K, used 1513K [0xd4380000, 0xd56c0000, 0xe7200000)
+  eden space 15104K, 10% used [0xd4380000,0xd44fa5e0,0xd5240000)
+  from space 2304K, 0% used [0xd5480000,0xd5480000,0xd56c0000)
+  to   space 2304K, 0% used [0xd5240000,0xd5240000,0xd5480000)
+ ParOldGen       total 39680K, used 0K [0xae600000, 0xb0cc0000, 0xd4380000)
+  object space 39680K, 0% used [0xae600000,0xae600000,0xb0cc0000)
+ Metaspace       used 1815K, capacity 2240K, committed 2328K, reserved 4400K
+
+Card table byte_map: [0xae439000,0xae600000] byte_map_base: 0xadec6000
+
+Marking Bits: (ParMarkBitMap*) 0xf7195d80
+ Begin Bits: [0xabfa0000, 0xacdd0000)
+ End Bits:   [0xacdd0000, 0xadc00000)
+
+Polling page: 0xf77ab000
+
+CodeCache: size=245760Kb used=718Kb max_used=720Kb free=245041Kb
+ bounds [0xe7600000, 0xe7840000, 0xf6600000]
+ total_blobs=201 nmethods=44 adapters=73
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 4.678 Thread 0xab4a9400 nmethod 39 0xe76b2048 code [0xe76b2140, 0xe76b21e0]
+Event: 4.778 Thread 0xab4a9400   40       3       java.lang.StringBuilder::<init> (7 bytes)
+Event: 4.779 Thread 0xab4a9400 nmethod 40 0xe76b2248 code [0xe76b2360, 0xe76b2540]
+Event: 4.787 Thread 0xab4a9400   41       3       java.lang.String::indexOf (166 bytes)
+Event: 4.788 Thread 0xab4a9400 nmethod 41 0xe76b2648 code [0xe76b27a0, 0xe76b2c60]
+Event: 4.876 Thread 0xab4a6000 nmethod 38 0xe76b3d48 code [0xe76b3ee0, 0xe76b3f90]
+Event: 4.898 Thread 0xab4a9400   42       3       sun.security.provider.SHA2::lf_S (11 bytes)
+Event: 4.898 Thread 0xab4a9400 nmethod 42 0xe76b3b08 code [0xe76b3c00, 0xe76b3cc0]
+Event: 4.922 Thread 0xab4a9400   43       3       java.util.concurrent.ConcurrentHashMap::tabAt (21 bytes)
+Event: 4.922 Thread 0xab4a9400 nmethod 43 0xe76b3508 code [0xe76b3620, 0xe76b37c0]
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Internal exceptions (10 events):
+Event: 2.287 Thread 0xf6607400 Exception <a 'java/lang/NoSuchMethodError': Method sun.misc.Unsafe.defineClass(Ljava/lang/String;[BII)Ljava/lang/Class; name or signature does not match> (0xd438f718) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims
+Event: 2.287 Thread 0xf6607400 Exception <a 'java/lang/NoSuchMethodError': Method sun.misc.Unsafe.prefetchRead(Ljava/lang/Object;J)V name or signature does not match> (0xd438f998) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jni.cpp, line 399
+Event: 4.020 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd441b220) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.298 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd4420f50) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.314 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd4422940) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.323 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd44246f0) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.780 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd445c1c8) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.787 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd445e350) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.898 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd4461510) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.922 Thread 0xf6607400 Exception <a 'java/security/PrivilegedActionException'> (0xd44af968) thrown at [/HUDSON/workspace/8-2-build-linux-i586/jdk8u5/2488/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+
+Events (10 events):
+Event: 4.897 loading class sun/security/provider/SHA2$SHA256
+Event: 4.897 loading class sun/security/provider/SHA2
+Event: 4.898 loading class sun/security/provider/SHA2 done
+Event: 4.898 loading class sun/security/provider/SHA2$SHA256 done
+Event: 4.898 loading class Core/Parser
+Event: 4.898 loading class Core/Parser done
+Event: 4.922 loading class java/lang/IndexOutOfBoundsException
+Event: 4.922 loading class java/lang/IndexOutOfBoundsException done
+Event: 4.922 loading class Core/Utils
+Event: 4.922 loading class Core/Utils done
+
+
+Dynamic libraries:
+08048000-08049000 r-xp 00000000 00:19 270815                             /home/chris/Eclipse/jdk1.8.0_05/bin/java
+08049000-0804a000 rw-p 00000000 00:19 270815                             /home/chris/Eclipse/jdk1.8.0_05/bin/java
+08e5a000-08e7b000 rw-p 00000000 00:00 0                                  [heap]
+aad09000-aad0a000 ---p 00000000 00:00 0 
+aad0a000-aad8a000 rw-p 00000000 00:00 0                                  [stack:10548]
+aad8a000-aad8d000 ---p 00000000 00:00 0 
+aad8d000-aaddb000 rw-p 00000000 00:00 0                                  [stack:10547]
+aaddb000-aadde000 ---p 00000000 00:00 0 
+aadde000-aae5c000 rw-p 00000000 00:00 0                                  [stack:10546]
+aae5c000-aae5f000 ---p 00000000 00:00 0 
+aae5f000-aaedd000 rw-p 00000000 00:00 0                                  [stack:10545]
+aaedd000-aaee0000 ---p 00000000 00:00 0 
+aaee0000-aaf5e000 rw-p 00000000 00:00 0                                  [stack:10544]
+aaf5e000-aaf61000 ---p 00000000 00:00 0 
+aaf61000-aafaf000 rw-p 00000000 00:00 0                                  [stack:10543]
+aafaf000-ab1af000 r--p 00000000 08:05 1048802                            /usr/lib/locale/locale-archive
+ab1af000-ab1b2000 ---p 00000000 00:00 0 
+ab1b2000-ab200000 rw-p 00000000 00:00 0                                  [stack:10542]
+ab200000-ab225000 rw-p 00000000 00:00 0 
+ab225000-ab300000 ---p 00000000 00:00 0 
+ab300000-ab321000 rw-p 00000000 00:00 0 
+ab321000-ab400000 ---p 00000000 00:00 0 
+ab400000-ab4fb000 rw-p 00000000 00:00 0 
+ab4fb000-ab500000 ---p 00000000 00:00 0 
+ab521000-ab524000 ---p 00000000 00:00 0 
+ab524000-ab572000 rw-p 00000000 00:00 0                                  [stack:10541]
+ab572000-ab573000 ---p 00000000 00:00 0 
+ab573000-ab5f3000 rw-p 00000000 00:00 0                                  [stack:10540]
+ab5f3000-ab7c8000 r--s 03c4d000 00:19 4468599                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/rt.jar
+ab7c8000-aba0e000 rw-p 00000000 00:00 0 
+aba0e000-abc14000 ---p 00000000 00:00 0 
+abc14000-adc00000 rw-p 00000000 00:00 0 
+adc00000-adc21000 rw-p 00000000 00:00 0 
+adc21000-add00000 ---p 00000000 00:00 0 
+add30000-add7f000 rw-p 00000000 00:00 0 
+add7f000-add80000 ---p 00000000 00:00 0 
+add80000-ade00000 rw-p 00000000 00:00 0                                  [stack:10539]
+ade00000-ade4d000 rw-p 00000000 00:00 0 
+ade4d000-adf00000 ---p 00000000 00:00 0 
+adf00000-adf21000 rw-p 00000000 00:00 0 
+adf21000-ae000000 ---p 00000000 00:00 0 
+ae024000-ae07f000 rw-p 00000000 00:00 0 
+ae07f000-ae080000 ---p 00000000 00:00 0 
+ae080000-ae100000 rw-p 00000000 00:00 0                                  [stack:10538]
+ae100000-ae121000 rw-p 00000000 00:00 0 
+ae121000-ae200000 ---p 00000000 00:00 0 
+ae208000-ae209000 ---p 00000000 00:00 0 
+ae209000-ae289000 rw-p 00000000 00:00 0                                  [stack:10537]
+ae289000-ae28a000 ---p 00000000 00:00 0 
+ae28a000-ae31e000 rw-p 00000000 00:00 0                                  [stack:10536]
+ae31e000-ae439000 ---p 00000000 00:00 0 
+ae439000-ae44d000 rw-p 00000000 00:00 0 
+ae44d000-ae567000 ---p 00000000 00:00 0 
+ae567000-ae572000 rw-p 00000000 00:00 0 
+ae572000-ae5ff000 ---p 00000000 00:00 0 
+ae5ff000-b0cc0000 rw-p 00000000 00:00 0 
+d4149000-d56c0000 rw-p 00000000 00:00 0 
+d56c0000-e7200000 ---p 00000000 00:00 0 
+e722a000-e7249000 rw-p 00000000 00:00 0 
+e7249000-e7600000 ---p 00000000 00:00 0 
+e7600000-e7840000 rwxp 00000000 00:00 0 
+e7840000-f6600000 ---p 00000000 00:00 0 
+f6600000-f66f9000 rw-p 00000000 00:00 0 
+f66f9000-f6700000 ---p 00000000 00:00 0 
+f6704000-f670f000 r-xp 00000000 08:05 786488                             /lib/i386-linux-gnu/libnss_files-2.19.so
+f670f000-f6710000 r--p 0000a000 08:05 786488                             /lib/i386-linux-gnu/libnss_files-2.19.so
+f6710000-f6711000 rw-p 0000b000 08:05 786488                             /lib/i386-linux-gnu/libnss_files-2.19.so
+f6711000-f6726000 r-xp 00000000 08:05 786501                             /lib/i386-linux-gnu/libnsl-2.19.so
+f6726000-f6727000 r--p 00015000 08:05 786501                             /lib/i386-linux-gnu/libnsl-2.19.so
+f6727000-f6728000 rw-p 00016000 08:05 786501                             /lib/i386-linux-gnu/libnsl-2.19.so
+f6728000-f672a000 rw-p 00000000 00:00 0 
+f672a000-f672f000 r--s 00092000 00:19 4468499                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/jsse.jar
+f672f000-f6748000 r-xp 00000000 00:19 4468537                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libzip.so
+f6748000-f6749000 rw-p 00018000 00:19 4468537                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libzip.so
+f6749000-f6751000 rw-s 00000000 08:05 524403                             /tmp/hsperfdata_chris/10529
+f6751000-f6775000 r-xp 00000000 00:19 4468568                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libjava.so
+f6775000-f6776000 rw-p 00023000 00:19 4468568                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libjava.so
+f6776000-f677d000 r-xp 00000000 08:05 786500                             /lib/i386-linux-gnu/librt-2.19.so
+f677d000-f677e000 r--p 00006000 08:05 786500                             /lib/i386-linux-gnu/librt-2.19.so
+f677e000-f677f000 rw-p 00007000 08:05 786500                             /lib/i386-linux-gnu/librt-2.19.so
+f677f000-f6782000 ---p 00000000 00:00 0 
+f6782000-f67d0000 rw-p 00000000 00:00 0                                  [stack:10535]
+f67d0000-f6814000 r-xp 00000000 08:05 786502                             /lib/i386-linux-gnu/libm-2.19.so
+f6814000-f6815000 r--p 00043000 08:05 786502                             /lib/i386-linux-gnu/libm-2.19.so
+f6815000-f6816000 rw-p 00044000 08:05 786502                             /lib/i386-linux-gnu/libm-2.19.so
+f6816000-f711e000 r-xp 00000000 00:19 4468528                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/server/libjvm.so
+f711e000-f7186000 rw-p 00908000 00:19 4468528                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/server/libjvm.so
+f7186000-f75aa000 rw-p 00000000 00:00 0 
+f75aa000-f7753000 r-xp 00000000 08:05 786532                             /lib/i386-linux-gnu/libc-2.19.so
+f7753000-f7754000 ---p 001a9000 08:05 786532                             /lib/i386-linux-gnu/libc-2.19.so
+f7754000-f7756000 r--p 001a9000 08:05 786532                             /lib/i386-linux-gnu/libc-2.19.so
+f7756000-f7757000 rw-p 001ab000 08:05 786532                             /lib/i386-linux-gnu/libc-2.19.so
+f7757000-f775a000 rw-p 00000000 00:00 0 
+f775a000-f775d000 r-xp 00000000 08:05 824847                             /lib/i386-linux-gnu/libdl-2.19.so
+f775d000-f775e000 r--p 00002000 08:05 824847                             /lib/i386-linux-gnu/libdl-2.19.so
+f775e000-f775f000 rw-p 00003000 08:05 824847                             /lib/i386-linux-gnu/libdl-2.19.so
+f775f000-f7760000 rw-p 00000000 00:00 0 
+f7760000-f7774000 r-xp 00000000 00:19 4466281                            /home/chris/Eclipse/jdk1.8.0_05/lib/i386/jli/libjli.so
+f7774000-f7775000 rw-p 00013000 00:19 4466281                            /home/chris/Eclipse/jdk1.8.0_05/lib/i386/jli/libjli.so
+f7775000-f778d000 r-xp 00000000 08:05 820098                             /lib/i386-linux-gnu/libpthread-2.19.so
+f778d000-f778e000 r--p 00017000 08:05 820098                             /lib/i386-linux-gnu/libpthread-2.19.so
+f778e000-f778f000 rw-p 00018000 08:05 820098                             /lib/i386-linux-gnu/libpthread-2.19.so
+f778f000-f7792000 rw-p 00000000 00:00 0 
+f7792000-f7794000 rw-p 00000000 00:00 0 
+f7794000-f7795000 r--p 002c5000 08:05 1048802                            /usr/lib/locale/locale-archive
+f7795000-f779f000 r-xp 00000000 08:05 786506                             /lib/i386-linux-gnu/libnss_nis-2.19.so
+f779f000-f77a0000 r--p 00009000 08:05 786506                             /lib/i386-linux-gnu/libnss_nis-2.19.so
+f77a0000-f77a1000 rw-p 0000a000 08:05 786506                             /lib/i386-linux-gnu/libnss_nis-2.19.so
+f77a1000-f77a8000 r-xp 00000000 08:05 786490                             /lib/i386-linux-gnu/libnss_compat-2.19.so
+f77a8000-f77a9000 r--p 00006000 08:05 786490                             /lib/i386-linux-gnu/libnss_compat-2.19.so
+f77a9000-f77aa000 rw-p 00007000 08:05 786490                             /lib/i386-linux-gnu/libnss_compat-2.19.so
+f77aa000-f77ab000 rw-p 00000000 00:00 0 
+f77ab000-f77ac000 ---p 00000000 00:00 0 
+f77ac000-f77b7000 r-xp 00000000 00:19 4468588                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libverify.so
+f77b7000-f77b8000 rw-p 0000b000 00:19 4468588                            /home/chris/Eclipse/jdk1.8.0_05/jre/lib/i386/libverify.so
+f77b8000-f77ba000 rw-p 00000000 00:00 0 
+f77ba000-f77bb000 r-xp 00000000 00:00 0                                  [vdso]
+f77bb000-f77db000 r-xp 00000000 08:05 824845                             /lib/i386-linux-gnu/ld-2.19.so
+f77db000-f77dc000 r--p 0001f000 08:05 824845                             /lib/i386-linux-gnu/ld-2.19.so
+f77dc000-f77dd000 rw-p 00020000 08:05 824845                             /lib/i386-linux-gnu/ld-2.19.so
+ffeb8000-ffeb9000 rwxp 00000000 00:00 0 
+ffeeb000-fff0c000 rw-p 00000000 00:00 0                                  [stack]
+
+VM Arguments:
+jvm_args: -Dfile.encoding=UTF-8 
+java_command: Core.Main
+java_class_path (initial): /home/chris/workspace/CoinJoin/target/classes:/home/chris/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar:/home/chris/.m2/repository/io/netty/netty-all/4.0.0.CR3/netty-all-4.0.0.CR3.jar:/home/chris/.m2/repository/javassist/javassist/3.12.1.GA/javassist-3.12.1.GA.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=/usr/local/apache-maven/apache-maven-3.2.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x863250], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x863250], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x6ef420], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: [libjvm.so+0x6ef420], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGXFSZ: [libjvm.so+0x6ef420], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x6ef420], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x6f0b30], sa_mask[0]=0x00000004, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x6f1f40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: [libjvm.so+0x6f1f40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGTERM: [libjvm.so+0x6f1f40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x6f1f40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=14.04
+DISTRIB_CODENAME=trusty
+DISTRIB_DESCRIPTION="Ubuntu 14.04.1 LTS"
+
+uname:Linux 3.13.0-35-generic #62-Ubuntu SMP Fri Aug 15 01:58:42 UTC 2014 x86_64
+libc:glibc 2.19 NPTL 2.19 
+rlimit: STACK 8192k, CORE 0k, NPROC 28776, NOFILE 4096, AS infinity
+load average:0.88 0.54 0.71
+
+/proc/meminfo:
+MemTotal:        3713164 kB
+MemFree:          103588 kB
+Buffers:            2368 kB
+Cached:           595984 kB
+SwapCached:            0 kB
+Active:          2849348 kB
+Inactive:         543956 kB
+Active(anon):    2807968 kB
+Inactive(anon):   498364 kB
+Active(file):      41380 kB
+Inactive(file):    45592 kB
+Unevictable:        3800 kB
+Mlocked:            3800 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:              1852 kB
+Writeback:             0 kB
+AnonPages:       2799232 kB
+Mapped:           164612 kB
+Shmem:            510980 kB
+Slab:              88536 kB
+SReclaimable:      40372 kB
+SUnreclaim:        48164 kB
+KernelStack:        5392 kB
+PageTables:        47852 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     1856580 kB
+Committed_AS:    8466640 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:      550236 kB
+VmallocChunk:   34359171452 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:    374784 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:       74692 kB
+DirectMap2M:     3780608 kB
+
+
+CPU:total 4 (2 cores per cpu, 2 threads per core) family 6 model 37 stepping 2, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, ht, tsc, tscinvbit
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 430  @ 2.27GHz
+stepping	: 2
+microcode	: 0x9
+cpu MHz		: 2267.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 4522.21
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 430  @ 2.27GHz
+stepping	: 2
+microcode	: 0x9
+cpu MHz		: 2267.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 2
+cpu cores	: 2
+apicid		: 4
+initial apicid	: 4
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 4522.21
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 430  @ 2.27GHz
+stepping	: 2
+microcode	: 0x9
+cpu MHz		: 2267.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 4522.21
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 430  @ 2.27GHz
+stepping	: 2
+microcode	: 0x9
+cpu MHz		: 2267.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 2
+cpu cores	: 2
+apicid		: 5
+initial apicid	: 5
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 4522.21
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 3713164k(103588k free), swap 0k(0k free)
+
+vm_info: Java HotSpot(TM) Server VM (25.5-b02) for linux-x86 JRE (1.8.0_05-b13), built on Mar 18 2014 00:45:30 by "java_re" with gcc 4.3.0 20080428 (Red Hat 4.3.0-8)
+
+time: Sat Sep 27 15:37:58 2014
+elapsed time: 6 seconds
+

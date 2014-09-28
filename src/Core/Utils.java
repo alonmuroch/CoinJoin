@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Utils {
 	
@@ -28,4 +30,16 @@ public class Utils {
 	            (b[0] & 0xFF) << 24;
 	}
 	
+	public static ArrayList<byte[]> divideArray(byte[] source, int chunksize) {
+
+	    ArrayList<byte[]> result = new ArrayList<byte[]>();
+	    int start = 0;
+	    while (start < source.length) {
+	        int end = Math.min(source.length, start + chunksize);
+	        result.add(Arrays.copyOfRange(source, start, end));
+	        start += chunksize;
+	    }
+
+	    return result;
+	}
 }

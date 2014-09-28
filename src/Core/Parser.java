@@ -12,9 +12,10 @@ public class Parser {
 	int length;
 	byte[] checksum = new byte[4];	
 	byte[] payload;
-	boolean malformed = false;
 
-	public Parser(byte[] message){
+	public Parser(byte[] message) throws MalformedMessageException, InvalidChecksumException{
+		boolean malformed = false;
+		byte chk[];
 		try {
 			for (int i = 0; i<4; i++){MAGIC_NUMBER[i] = message[i];}
 			byte[] cmd = new byte[12];
@@ -27,6 +28,7 @@ public class Parser {
 			else if (Arrays.equals(cmd, Command.VERACK.getValue())){command = Command.VERACK;}
 			else if (Arrays.equals(cmd, Command.PING.getValue())){command = Command.PING;}
 			else if (Arrays.equals(cmd, Command.PONG.getValue())){command = Command.PONG;}
+			else if (Arrays.equals(cmd, Command.GETADDR.getValue())){command = Command.GETADDR;}
 			else if (Arrays.equals(cmd, Command.REJECT.getValue())){command = Command.REJECT;}
 			a = 0;
 			byte len[] = new byte[4];
@@ -54,20 +56,36 @@ public class Parser {
 			for (int i = 0; i<4; i++){
 				outputStream.write(hashbytes[i]);
 			}
-			byte[] chk = outputStream.toByteArray();
-			try {if (!Arrays.equals(checksum, chk)){throw new InvalidChecksumException();}} 
-			catch (InvalidChecksumException e){malformed=true;}
+			chk = outputStream.toByteArray();
 		}
-		catch (Exception e){malformed=true;}
+		catch (IndexOutOfBoundsException e){
+			malformed = true;
+			throw new MalformedMessageException();
+		}
+		if (!Arrays.equals(checksum, chk) && !malformed){throw new InvalidChecksumException();}
+	}
+	
+	public static Command getCommand(byte[] payload){
+		Command c = null;
+		int a = 0;
+		byte[] cmd = new byte[12];
+		for (int i = 4; i<16; i++){
+			cmd[a] = payload[i];
+			a++;
+		}
+		if (Arrays.equals(cmd, Command.VERSION.getValue())){c = Command.VERSION;}
+		else if (Arrays.equals(cmd, Command.VERACK.getValue())){c = Command.VERACK;}
+		else if (Arrays.equals(cmd, Command.PING.getValue())){c = Command.PING;}
+		else if (Arrays.equals(cmd, Command.PONG.getValue())){c = Command.PONG;}
+		else if (Arrays.equals(cmd, Command.REJECT.getValue())){c = Command.REJECT;}
+		return c;
 	}
 	
 	public void printMessage(){
-		if (!malformed){
-			System.out.println("Magic Number: " + Utils.bytesToHex(MAGIC_NUMBER));
-			System.out.println("Command: " + command.toString());
-			System.out.println("Length: " + length);
-			System.out.println("Checksum: " + Utils.bytesToHex(checksum));
-			System.out.println("Payload: " + Utils.bytesToHex(payload));
-		}
+		System.out.println("Magic Number: " + Utils.bytesToHex(MAGIC_NUMBER));
+		System.out.println("Command: " + command.toString());
+		System.out.println("Length: " + length);
+		System.out.println("Checksum: " + Utils.bytesToHex(checksum));
+		System.out.println("Payload: " + Utils.bytesToHex(payload));
 	}
 }

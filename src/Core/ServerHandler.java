@@ -26,34 +26,34 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 		channels.remove(ctx.channel());
 		System.out.println(incoming.remoteAddress() + " has disconnected");
 		System.out.println("");
+		Main.peergroup.disconnectPeer(incoming.remoteAddress());
 	}
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, Object message) throws Exception {
 		
+		boolean twice = false;
 		Channel incoming = ctx.channel();
-		//incoming.write("[ECHO] " + message + "\n");
 		System.out.println("Received message from " + incoming.remoteAddress() + ":");
-		Parser p = new Parser((byte[]) message);
-		if (p.malformed){
-			System.out.println("Message malformed. Sending REJECT message...");
-			Reject r = new Reject(p.command, ccode.REJECT_MALFORMED);
-			Message rejectmessage = new Message(Command.REJECT, r.serialize());
-			incoming.write(rejectmessage.serialize());
-		}
-		else {
+		try {
+			Parser p = new Parser((byte[]) message);
 			p.printMessage();
 			switch(p.command){
 				case VERSION:
 					Version ver = new Version(p.payload);
 					ver.printVersion();
-					System.out.println("");
-						System.out.println("Sending VERACK message...");
-					Message verack = new Message(Command.VERACK, new byte[0]);
-					incoming.write(verack.serialize());
 					if (ver.version<10000){
 						//Do something if it isn't the version we're looking for
 					} 
+					System.out.println("");
+					System.out.println("Added new peer:");
+					Peer peer = new Peer(incoming.remoteAddress(), ver.version, ver.onion, true);
+					Main.peergroup.addConnected(peer);
+					peer.printPeer();
+					System.out.println("");
+					System.out.println("Sending VERACK message...");
+					Message verack = new Message(Command.VERACK, new byte[0]);
+					incoming.write(verack.serialize());
 					ver = new Version();
 					Message version = new Message(Command.VERSION, ver.serialize());
 					System.out.println("Sending VERSION message...");
@@ -69,6 +69,7 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					Ping ping = new Ping(p.payload);
 					System.out.println("");
 					System.out.println("Sending PONG message...");
+					System.out.println("");
 					Pong pong = new Pong(ping.nonce);
 					Message msgpong = new Message(Command.PONG, pong.serialize());
 					incoming.write(msgpong.serialize());
@@ -80,13 +81,29 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					//This is where we will check to see if the received nonce is the same as the one we sent.
 					//If so, then we connected to ourselves and must disconnect.
 					break;
+				
+				case GETADDR:
+					System.out.println("");
+					break;
 					
 				case REJECT:
 					Reject r = new Reject(p.payload);
 					r.printReject();
+					System.out.println("");
 					break;
 			}
+		} catch (MalformedMessageException e){
+			System.out.println("Message malformed. Sending REJECT message...");
+			Reject r = new Reject(Parser.getCommand((byte[]) message), ccode.REJECT_MALFORMED);
+			Message rejectmessage = new Message(Command.REJECT, r.serialize());
+			incoming.write(rejectmessage.serialize());
+		} catch (InvalidChecksumException e1){
+			System.out.println("Invalid Checksum. Sending REJECT message...");
+			Reject r = new Reject(Parser.getCommand((byte[]) message), ccode.REJECT_MALFORMED);
+			Message rejectmessage = new Message(Command.REJECT, r.serialize());
+			incoming.write(rejectmessage.serialize());
 		}
+		
 	}
 
 }
