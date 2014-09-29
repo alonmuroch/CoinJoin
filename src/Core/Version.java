@@ -13,26 +13,16 @@ public class Version {
 
 	int version = 10000;
 	byte[] services = {00,00,00,00,00,00,00,00};
-	long timestamp = System.currentTimeMillis() / 1000L;
-	byte[] onion = new byte[10];
-	byte[] nonce = new byte[8];
+	NetworkAddress addr;
+	byte[] nonce;
 	
 	public Version(){
 		
 	}
 	
-	public Version(byte[] nonce) {
+	public Version(byte[] nonce, NetworkAddress addr) {
 		this.nonce = nonce;
-		byte[] zeros = {00,00,00,00,00,00,00,00,00,00};
-		this.onion = zeros;
-	}
-	
-	public Version(String onion, byte[] nonce) {
-		//Onion is base32 representation of the Tor .onion address; 
-		//Encode using:  String base32String = Base32.encode(rawDataBytes);
-		Base32 base32 = new Base32();
-		this.onion = base32.decode(onion);
-		this.nonce = nonce;
+		this.addr = addr;
 	}
 	
 	public void parse(byte[] payload){
@@ -45,21 +35,18 @@ public class Version {
 			services[a]=payload[i];
 			a++;
 		}
-		byte[] ts = new byte[8];
+		byte[] na = new byte[27];
 		a = 0;
-		for (int i=12; i<20; i++){
-			ts[a]=payload[i];
+		for (int i=12; i<39; i++){
+			na[a]=payload[i];
 			a++;
 		}
-		wrapped = ByteBuffer.wrap(ts);
-		timestamp = wrapped.getLong();
+		addr = new NetworkAddress();
+		try {addr.parse(na);} 
+		catch (IOException e) {e.printStackTrace();}
 		a = 0;
-		for (int i=20; i<30; i++){
-			onion[a]=payload[i];
-			a++;
-		}
-		a = 0;
-		for (int i=30; i<38; i++){
+		nonce = new byte[8];
+		for (int i=39; i<47; i++){
 			nonce[a]=payload[i];
 			a++;
 		}
@@ -69,18 +56,16 @@ public class Version {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 		outputStream.write(ByteBuffer.allocate(4).putInt(version).array());
 		outputStream.write(services);
-		outputStream.write(ByteBuffer.allocate(8).putLong(timestamp).array());
-		outputStream.write(onion);
+		outputStream.write(addr.serialize());
 		outputStream.write(nonce);
 		byte output[] = outputStream.toByteArray();
 		return output;
 	}
 	
-	public void printVersion(){
+	public void printVersion() throws IOException{
 		System.out.println("Version: " + version);
 		System.out.println("Services: " + Utils.bytesToHex(services));
-		System.out.println("Timestamp: " + timestamp);
-		System.out.println("Onion: " + Utils.bytesToHex(onion));
+		addr.printNetworkAddress();
 		System.out.println("Nonce: " + Utils.bytesToHex(nonce));
 	}
 	

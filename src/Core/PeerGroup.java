@@ -3,51 +3,32 @@ package Core;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class PeerGroup {
 
-	ArrayList<Peer> peergroup = new ArrayList<Peer>();
+	public static Map<Integer, Peer> peers = new HashMap<Integer,Peer>();
+	public static ArrayList<NetworkAddress> knownPeers = new ArrayList<NetworkAddress>();
 	
 	public PeerGroup(){
-		
+		addPeers();
 	}
 	
-	public void addConnected(Peer peer){
-		boolean exists = false;
-		for (Peer p : peergroup){
-			if (Arrays.equals(p.networkAddress.addr, peer.networkAddress.addr)){
-				exists = true;
-				p.peerID = peer.peerID;
+	public void addPeers(){
+		DNSSeeds seeds = new DNSSeeds();
+		for (int i=0; i<peers.size()+1; i++){
+			if (!peers.containsKey(i)){
+				Peer peer = new Peer(seeds.seeds.get(0), i);
+				peer.connect();
+				peers.put(i, peer);
+				break;
 			}
 		}
-		if (!exists){peergroup.add(peer);}
 	}
 	
-	public void addDisconnected(Peer peer){
-		boolean exists = false;
-		for (Peer p : peergroup){
-			if (p.networkAddress.addr == peer.networkAddress.addr){
-				exists = true;
-				p.peerID = new byte[]{00};
-			}
-		}
-		if (!exists){peergroup.add(peer);}
+	public void removePeer(int peerID){
+		peers.remove(peerID);
 	}
-	
-	public void disconnectPeer(byte[] peerID){
-		for (Peer p : peergroup){
-			if (Arrays.equals(p.peerID, peerID)){p.peerID = new byte[]{00};}
-		}
-	}
-	
-	public ArrayList<Peer> getConnectedPeers(){
-		ArrayList<Peer> connected = new ArrayList<Peer>();
-		for (Peer p : peergroup){
-			if (Arrays.equals(p.peerID, new byte[]{00})){
-				connected.add(p);
-			}
-		}
-		return connected;
-	}
-	
 }

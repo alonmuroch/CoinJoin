@@ -10,8 +10,6 @@ import java.util.StringTokenizer;
 
 public class Utils {
 	
-	public static byte[] IP = {00,00,00,00,00,00,00,00,00,00};
-	
 	/**Converts a byte array to a hex string*/
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHex(byte[] bytes) {
@@ -109,5 +107,20 @@ public class Utils {
 	    
 	    return ipInt;
 	  }
+	
+	public static String ipBytesToString(byte[] rawBytes) {
+        int i = 4;
+        String ipAddress = "";
+        for (byte raw : rawBytes)
+        {
+            ipAddress += (raw & 0xFF);
+            if (--i > 0)
+            {
+                ipAddress += ".";
+            }
+        }
+ 
+        return ipAddress;
+    }
 
 }

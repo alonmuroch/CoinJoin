@@ -9,6 +9,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundMessageHandlerAdapter;
 
 public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
+	int peerID;
+
+	public ClientHandler(int peerID) {
+		this.peerID = peerID;
+	}
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -26,33 +31,15 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 						//Do something if it isn't the version we're looking for
 					} 
 					if (Arrays.equals(ver.nonce, Main.coinjoin.nonce)){
-						Main.coinjoin.clients.get(0).close();
+						Main.coinjoin.peergroup.peers.get(peerID).completeConnection(false);
 					}
 					else {
-						System.out.println("");
-						System.out.println("Added new peer:");
-						Peer peer = null;
-						//If using IP network
-						if (Arrays.equals(ver.onion, Utils.IP)){
-							String socketAddress = incoming.remoteAddress().toString();
-							String ip = null;
-							if (socketAddress.contains("/")){
-								socketAddress = incoming.remoteAddress().toString().substring(incoming.remoteAddress().toString().indexOf("/"), incoming.remoteAddress().toString().length());
-							}
-							ip = socketAddress.substring(1, socketAddress.indexOf(":"));
-							peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
-						}
-						//If using Tor
-						else {
-							peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
-						}
-						Main.coinjoin.peergroup.addConnected(peer);
-						peer.printPeer();
 						System.out.println("");
 						System.out.println("Sending VERACK message...");
 						System.out.println("");
 						Message verack = new Message(Command.VERACK, new byte[0]);
 						incoming.write(verack.serialize());
+						Main.coinjoin.peergroup.peers.get(peerID).completeConnection(true);
 						System.out.println("Enter a command:");
 						System.out.print(">>> ");
 					}
@@ -63,7 +50,8 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					break;
 				
 				case PING:
-					Ping ping = new Ping(p.payload);
+					Ping ping = new Ping();
+					ping.parse(p.payload);
 					System.out.println("");
 					System.out.println("Sending PONG message...");
 					Pong pong = new Pong(ping.nonce);
@@ -86,7 +74,8 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					break;
 					
 				case ADDR:
-					Addr a = new Addr(p.payload);
+					Addr a = new Addr();
+					a.parse(p.payload);
 					a.printAddr();
 					System.out.println("");
 					System.out.println("Enter a command:");
@@ -115,7 +104,7 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception{
-		System.out.println("Connected to server");
+		System.out.println("Peer " + peerID + " connected to server");
 	}
 	
 }

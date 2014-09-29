@@ -11,7 +11,7 @@ public class Ping {
 		sr.nextBytes(nonce);
 	}
 	
-	public Ping(byte[] payload){
+	public void parse(byte[] payload){
 		this.nonce = payload;
 	}
 	

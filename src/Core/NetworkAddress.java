@@ -16,6 +16,10 @@ public class NetworkAddress {
 	byte[] addr;
 	byte[] port = new byte[] { (byte) 0x1F, (byte) 0x40};
 	
+	public NetworkAddress(){
+		
+	}
+	
 	public NetworkAddress(NetworkType type, byte[] addr, long timestamp) throws IOException{
 		this.network = type;
 		this.timestamp = timestamp;
@@ -34,7 +38,7 @@ public class NetworkAddress {
 		}
 	}
 	
-	public NetworkAddress(byte[] payload){
+	public void parse(byte[] payload) throws IOException{
 		byte[] ts = new byte[8];
 		for (int i=0; i<8; i++){
 			ts[i]=payload[i];
@@ -46,6 +50,7 @@ public class NetworkAddress {
 		if (Arrays.equals(type, NetworkType.IPv4.getValue())){this.network = NetworkType.IPv4;}
 		else if (Arrays.equals(type, NetworkType.IPv6.getValue())){this.network = NetworkType.IPv6;}
 		else if (Arrays.equals(type, NetworkType.Tor.getValue())){this.network = NetworkType.Tor;}
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );		
 		if (network==NetworkType.IPv4){
 			addr = new byte[4];
 			int a=0;
@@ -53,6 +58,9 @@ public class NetworkAddress {
 				addr[a]=payload[i];
 				a++;
 			}
+			outputStream.write(addr); 
+			outputStream.write(new byte[]{00,00,00,00,00,00,00,00,00,00,00,00,});
+			addr = outputStream.toByteArray();
 		}
 		if (network==NetworkType.IPv6){
 			addr = new byte[16];
@@ -69,6 +77,9 @@ public class NetworkAddress {
 				addr[a]=payload[i];
 				a++;
 			}
+			outputStream.write(addr); 
+			outputStream.write(new byte[]{00,00,00,00,00,00});
+			addr = outputStream.toByteArray();
 		}
 		int a=0;
 		for (int i=25; i<27; i++){
@@ -76,6 +87,48 @@ public class NetworkAddress {
 			a++;
 		}
 		
+	}
+	
+	public byte[] getAddress(){
+		if (network==NetworkType.IPv4){
+			byte[] address = new byte[4];
+			for (int i=0; i<4; i++){
+				address[i] = addr[i];
+			}
+			return address;
+		}
+		if (network==NetworkType.Tor){
+			byte[] address = new byte[10];
+			for (int i=0; i<10; i++){
+				address[i] = addr[i];
+			}
+			return address;
+		}
+		else{
+			return addr;
+		}
+	}	
+	
+	public String getAddressAsString(){
+		return Utils.ipBytesToString(getAddress());
+	}
+	
+	public void setAddress(NetworkType network, String IP) throws IOException{
+		if (network==NetworkType.IPv6){
+			addr = Utils.ipStringToBytes(IP);
+		}
+		else if (network==NetworkType.IPv4){
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+			outputStream.write(Utils.ipStringToBytes(IP));
+			outputStream.write(new byte[]{00,00,00,00,00,00,00,00,00,00,00,00});
+			addr = outputStream.toByteArray();
+		}
+	}
+	
+	public int getPort(){
+		ByteBuffer wrapped = ByteBuffer.wrap(port);
+		int ret = wrapped.getInt();
+		return ret;
 	}
 	
 	public enum NetworkType {

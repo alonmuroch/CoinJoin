@@ -26,13 +26,13 @@ public class NioClient {
 		this.port = port;
 	}
 	
-	public void run() throws InterruptedException, IOException {
+	public void run(int peerID) throws InterruptedException, IOException {
 		group = new NioEventLoopGroup();
 		
 		Bootstrap bootstrap = new Bootstrap()
 			.group(group)
 			.channel(NioSocketChannel.class)
-			.handler(new ClientInitializer());
+			.handler(new ClientInitializer(peerID));
 		channel = bootstrap.connect(host, port).sync().channel();
 	}
 	

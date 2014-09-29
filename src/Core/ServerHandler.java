@@ -32,7 +32,6 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 		channels.remove(ctx.channel());
 		System.out.println(incoming.remoteAddress() + " has disconnected");
 		System.out.println("");
-		Main.coinjoin.peergroup.disconnectPeer(Peer.getPeerID(incoming.remoteAddress()));
 	}
 
 	@Override
@@ -52,25 +51,19 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					if (ver.version<10000){
 						//Do something if it isn't the version we're looking for
 					} 
-					System.out.println("");
-					System.out.println("Added new peer:");
 					Peer peer = null;
 					//If using IP network
-					if (Arrays.equals(ver.onion, Utils.IP)){
+					if (ver.addr.network!=NetworkType.Tor){
 						String ip = incoming.remoteAddress().toString().substring(1, incoming.remoteAddress().toString().indexOf(":"));
-						peer = new Peer(new NetworkAddress(NetworkType.IPv4, Utils.ipStringToBytes(ip), System.currentTimeMillis()/1000L), ver.version);
+						ver.addr.setAddress(ver.addr.network, ip);
 					}
-					//If using Tor
-					else {
-						peer = new Peer(new NetworkAddress(NetworkType.Tor, ver.onion, System.currentTimeMillis()/1000L), ver.version);
-					}
-					Main.coinjoin.peergroup.addConnected(peer);
-					peer.printPeer();
+					CoinjoinAppKit.peergroup.knownPeers.add(ver.addr);
 					System.out.println("");
 					System.out.println("Sending VERACK message...");
 					Message verack = new Message(Command.VERACK, new byte[0]);
 					incoming.write(verack.serialize());
-					ver = new Version(Main.coinjoin.nonce);
+					NetworkAddress n = new NetworkAddress(NetworkType.IPv4, new byte[]{00,00,00,00}, System.currentTimeMillis() / 1000L);
+					ver = new Version(Main.coinjoin.nonce, n);
 					Message version = new Message(Command.VERSION, ver.serialize());
 					System.out.println("Sending VERSION message...");
 					System.out.println("");
@@ -82,7 +75,8 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 					break;
 				
 				case PING:
-					Ping ping = new Ping(p.payload);
+					Ping ping = new Ping();
+					ping.parse(p.payload);
 					System.out.println("");
 					System.out.println("Sending PONG message...");
 					System.out.println("");
@@ -101,13 +95,9 @@ public class ServerHandler extends ChannelInboundMessageHandlerAdapter {
 				case GETADDR:
 					System.out.println("");
 					System.out.println("Sending ADDR message...");
-					ArrayList<NetworkAddress> addressList = new ArrayList<NetworkAddress>();
-					for (Peer peers : Main.coinjoin.peergroup.peergroup){
-						addressList.add(peers.networkAddress);
-					}
-					Addr a = new Addr(addressList);
-					Message addrmgs = new Message(Command.ADDR, a.serialize());
-					incoming.write(addrmgs.serialize());
+					Addr a = new Addr(Main.coinjoin.peergroup.knownPeers);
+					Message addrmsg = new Message(Command.ADDR, a.serialize());
+					incoming.write(addrmsg.serialize());
 					break;
 					
 				case REJECT:

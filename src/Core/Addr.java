@@ -11,6 +11,10 @@ public class Addr {
 	private byte[] addresses;
 	ArrayList<NetworkAddress> addressList = new ArrayList<NetworkAddress>();
 	
+	public Addr(){
+		
+	}
+	
 	public Addr (ArrayList<NetworkAddress> addresslist){
 		this.size = addresslist.size();
 		this.addressList = addresslist;
@@ -21,7 +25,7 @@ public class Addr {
 		addresses = outputStream.toByteArray();
 	}
 	
-	public Addr (byte[] payload){
+	public void parse(byte[] payload){
 		byte[] sz = new byte[4];
 		for (int i=0; i<4; i++){sz[i]=payload[i];}
 		ByteBuffer wrapped = ByteBuffer.wrap(sz);
@@ -34,7 +38,12 @@ public class Addr {
 		}
 		ArrayList<byte[]> temp = new ArrayList<byte[]>();
 		temp = Utils.divideArray(addresses, 27);
-		for (byte[] arr : temp){addressList.add(new NetworkAddress(arr));}
+		for (byte[] arr : temp){
+			NetworkAddress n = new NetworkAddress();
+			try {n.parse(arr);} 
+			catch (IOException e) {e.printStackTrace();}
+			addressList.add(n);
+		}
 	}
 	
 	public byte[] serialize() throws IOException{
