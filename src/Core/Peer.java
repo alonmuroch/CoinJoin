@@ -33,15 +33,17 @@ public class Peer {
 				client.run(listener);
 			}
 			try {send(Command.VERSION);} catch (IOException e) {return false;}
-			try{listener.doWait();} catch (PeerTimeoutException e) {return false;}
-			try{listener.doWait();} catch (PeerTimeoutException e) {return false;}
+			try{listener.doWait();} catch (PeerTimeoutException e) {disconnect();return false;}
+			try{listener.doWait();} catch (PeerTimeoutException e) {disconnect();return false;}
 			if (listener.event.connected){
 				try {send(Command.VERACK);} catch (IOException e) {return false;}
 				checkKnownPeers();
 				startPingPong();
 				return true;
 			}
-			else {return false;}
+			else {
+				disconnect();
+				return false;}
 	
 		}
 		catch (Exception e){
@@ -53,7 +55,7 @@ public class Peer {
 		pingpong = new Thread(new Runnable() {
 		    public void run() {
 		    	while(true){
-		    		try {Thread.sleep(10000);} catch (InterruptedException e) {pingpong.start();}
+		    		try {Thread.sleep(1000);} catch (InterruptedException e) {pingpong.start();}
 		    		try {send(Command.PING);} catch (IOException e) {disconnect();}
 		    		try {listener.doWait();} catch (PeerTimeoutException e) {disconnect();}
 		    	}
@@ -77,7 +79,10 @@ public class Peer {
 		System.out.println("Disconnected from peer");
 		try {client.close();}
 		catch (Exception e){}
-		Main.coinjoin.peergroup.removePeer(this);
+		if (Main.coinjoin.peergroup.peers.contains(this)){
+				Main.coinjoin.peergroup.removePeer(this);
+		}
+		try {pingpong.interrupt();} catch (Exception e){}
 	}
 	
 	

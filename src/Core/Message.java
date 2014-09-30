@@ -38,8 +38,8 @@ public class Message {
 		outputStream.write(ByteBuffer.allocate(4).putInt(length).array());
 		outputStream.write(checksum);
 		outputStream.write(payload);
-		String append = "\r\n";
-		outputStream.write(append.getBytes());
+		String delimiter = "e6982d514bce827a00649bb6b2607624f6f0aa12";
+		outputStream.write(delimiter.getBytes());
 		byte output[] = outputStream.toByteArray();
 		return output;
 	}
