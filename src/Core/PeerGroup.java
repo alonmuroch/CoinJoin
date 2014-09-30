@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class PeerGroup {
 
-	public static Map<Integer, Peer> peers = new HashMap<Integer,Peer>();
+	public static ArrayList<Peer> peers = new ArrayList<Peer>();
 	public static ArrayList<NetworkAddress> knownPeers = new ArrayList<NetworkAddress>();
 	
 	public PeerGroup(){
@@ -18,17 +18,11 @@ public class PeerGroup {
 	
 	public void addPeers(){
 		DNSSeeds seeds = new DNSSeeds();
-		for (int i=0; i<peers.size()+1; i++){
-			if (!peers.containsKey(i)){
-				Peer peer = new Peer(seeds.seeds.get(0), i);
-				peer.connect();
-				peers.put(i, peer);
-				break;
-			}
-		}
+		Peer p = new Peer(seeds.getSeeds().get(0));
+		if (p.connect()){peers.add(p);}
 	}
 	
-	public void removePeer(int peerID){
-		peers.remove(peerID);
+	public void removePeer(Peer peer){
+		peers.remove(peer);
 	}
 }

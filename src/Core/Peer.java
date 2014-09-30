@@ -3,61 +3,85 @@ import java.io.IOException;
 
 import Core.DNSSeeds.Seed;
 import Core.NetworkAddress.NetworkType;
+import Core.PeerEventListener.PeerEvent;
 import Core.Reject.ccode;
 
 public class Peer {
 	
 	NioClient client;
 	NetworkAddress networkAddress;
-	int version;
 	Seed seed = null;
-	int peerID;
+	PeerEventListener listener = new PeerEventListener();
+	Thread pingpong;
 	
-	public Peer (NetworkAddress addr, int peerID){
+	public Peer (NetworkAddress addr){
 		this.networkAddress = addr;
-		this.peerID = peerID;
 	}
 	
-	public Peer (Seed dnsSeed, int peerID){
+	public Peer (Seed dnsSeed){
 		this.seed = dnsSeed;
-		this.peerID = peerID;
 	}
 	
-	public void connect(){
+	public boolean connect(){
 		try{
 			if (this.seed == null){
 				client = new NioClient(networkAddress.getAddressAsString(), networkAddress.getPort());
-				client.run(peerID);
+				client.run(listener);
 			}
 			else {
 				client = new NioClient(seed.domain, seed.port);
-				client.run(peerID);
+				client.run(listener);
 			}
-			try {send(Command.VERSION);} catch (IOException e) {e.printStackTrace();}
+			try {send(Command.VERSION);} catch (IOException e) {return false;}
+			try{listener.doWait();} catch (PeerTimeoutException e) {return false;}
+			try{listener.doWait();} catch (PeerTimeoutException e) {return false;}
+			if (listener.event.connected){
+				try {send(Command.VERACK);} catch (IOException e) {return false;}
+				checkKnownPeers();
+				startPingPong();
+				return true;
+			}
+			else {return false;}
 	
 		}
 		catch (Exception e){
+			return false;
 		}
 	}
 	
-	public void completeConnection(boolean completed){
-		if (!completed){
-			Main.coinjoin.peergroup.removePeer(peerID);
-			try {client.close();}
-			catch (Exception e){}
-		}
-		else {
-			try {send(Command.GETADDR);} catch (IOException e) {e.printStackTrace();}
-		}
+	public void startPingPong(){
+		pingpong = new Thread(new Runnable() {
+		    public void run() {
+		    	while(true){
+		    		try {Thread.sleep(10000);} catch (InterruptedException e) {pingpong.start();}
+		    		try {send(Command.PING);} catch (IOException e) {disconnect();}
+		    		try {listener.doWait();} catch (PeerTimeoutException e) {disconnect();}
+		    	}
+		    }
+		});
+		pingpong.start();
+	}
+	
+	public void checkKnownPeers(){
+		new Thread(new Runnable() {
+		    public void run() {
+		    	if (Main.coinjoin.peergroup.knownPeers.size()<1000){
+		    		try {send(Command.GETADDR);} catch (IOException e) {disconnect();}
+					try {listener.doWait();} catch (PeerTimeoutException e) {disconnect();}
+		    	}
+		    }
+		}).start();
 	}
 	
 	public void disconnect(){
+		System.out.println("Disconnected from peer");
 		try {client.close();}
 		catch (Exception e){}
+		Main.coinjoin.peergroup.removePeer(this);
 	}
 	
 	
-	public void send(Command cmd) throws IOException{
+	public void send(Command cmd) throws IOException {
 		
 		Message message = null;
 		switch(cmd){
@@ -67,6 +91,13 @@ public class Peer {
 			message = new Message(Command.VERSION, ver.serialize());
 			System.out.println("Sending VERSION message...");
 			System.out.println("");
+			break;
+			
+		case VERACK:
+			System.out.println("");
+			System.out.println("Sending VERACK message...");
+			System.out.println("");
+			message = new Message(Command.VERACK, new byte[0]);
 			break;
 		
 		case PING:

@@ -15,10 +15,10 @@ import io.netty.handler.codec.string.StringEncoder;
 
 public class ClientInitializer extends ChannelInitializer<SocketChannel> {
 
-	int peerID;
+	PeerEventListener listener;
 	
-	public ClientInitializer(int peerID) {
-		this.peerID = peerID;
+	public ClientInitializer(PeerEventListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class ClientInitializer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast("framer", new DelimiterBasedFrameDecoder(10000, Delimiters.lineDelimiter()));
 		pipeline.addLast("decoder", new ByteArrayDecoder());
 		pipeline.addLast("encoder", new ByteArrayEncoder());
-		pipeline.addLast("handler", new ClientHandler(peerID));
+		pipeline.addLast("handler", new ClientHandler(listener));
 	}
 
 }

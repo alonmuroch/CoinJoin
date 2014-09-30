@@ -9,10 +9,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundMessageHandlerAdapter;
 
 public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
-	int peerID;
+	PeerEventListener listener;
 
-	public ClientHandler(int peerID) {
-		this.peerID = peerID;
+	public ClientHandler(PeerEventListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -27,25 +27,18 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					Version ver = new Version();
 					ver.parse(p.payload);
 					ver.printVersion();
-					if (ver.version<10000){
-						//Do something if it isn't the version we're looking for
-					} 
-					if (Arrays.equals(ver.nonce, Main.coinjoin.nonce)){
-						Main.coinjoin.peergroup.peers.get(peerID).completeConnection(false);
+					if (Arrays.equals(ver.nonce, Main.coinjoin.nonce) || ver.version!=10000){
+						listener.event.connected = false;
+						listener.doNotify();
 					}
 					else {
-						System.out.println("");
-						System.out.println("Sending VERACK message...");
-						System.out.println("");
-						Message verack = new Message(Command.VERACK, new byte[0]);
-						incoming.write(verack.serialize());
-						Main.coinjoin.peergroup.peers.get(peerID).completeConnection(true);
-						System.out.println("Enter a command:");
-						System.out.print(">>> ");
+						listener.event.connected = true;
+						listener.doNotify();
 					}
 					break;
 	
 				case VERACK:
+					listener.doNotify();
 					System.out.println("");
 					break;
 				
@@ -62,8 +55,7 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 				case PONG:
 					Pong pongresp = new Pong(p.payload);
 					byte[] nonce = pongresp.nonce;
-					//This is where we will check to see if the received nonce is the same as the one we sent.
-					//If so, then we connected to ourselves and must disconnect.
+					listener.doNotify();
 					System.out.println("");
 					System.out.println("Enter a command:");
 					System.out.print(">>> ");
@@ -77,9 +69,18 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 					Addr a = new Addr();
 					a.parse(p.payload);
 					a.printAddr();
+					listener.doNotify();
+					boolean exists = false;
+					for (NetworkAddress addr : a.addressList){
+						for (NetworkAddress knownaddr : Main.coinjoin.peergroup.knownPeers){
+							if (Arrays.equals(addr.addr, knownaddr.addr) && Arrays.equals(addr.port, knownaddr.port)){
+									exists = true;
+							}
+						}
+						if (!exists){Main.coinjoin.peergroup.knownPeers.add(addr);}
+						exists = false;
+					}
 					System.out.println("");
-					System.out.println("Enter a command:");
-					System.out.print(">>> ");
 					break;
 			
 				case REJECT:
@@ -104,7 +105,7 @@ public class ClientHandler extends ChannelInboundMessageHandlerAdapter {
 	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception{
-		System.out.println("Peer " + peerID + " connected to server");
+		System.out.println("CoinJoin: connected to " + ctx.channel().localAddress());
 	}
 	
 }
